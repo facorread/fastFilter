@@ -26,7 +26,10 @@
 int main()
 {
 	std::locale netLogoLocale(std::locale::classic(), new sim::netLogoCtypeCls); // We recommend only one global object.
-	const std::filesystem::path inputbase("C:/Users/dirac/NoBackup/2idh/MacPro/temp/5790386/Seans-Mac-Pro.asc.ohio-state.edu/anthropogenic");
+	//const std::filesystem::path inputbase("C:/Users/dirac/NoBackup/2idh/MacPro/temp/5790386/Seans-Mac-Pro.asc.ohio-state.edu/anthropogenic");
+	//const std::filesystem::path inputbase("C:/Users/dirac/NoBackup/2idh/MacPro/temp/5790386/Seans-Mac-Pro.asc.ohio-state.edu/natural");
+	//const std::filesystem::path inputbase("C:/Users/dirac/NoBackup/2idh/NewMacPro/temp/5790386/ANT-NC144633/anthropogenic");
+	const std::filesystem::path inputbase("C:/Users/dirac/NoBackup/2idh/NewMacPro/temp/5790386/ANT-NC144633/natural");
 	std::filesystem::path ifilename(inputbase);
 	ifilename += ".csv";
 	std::ifstream ifile(ifilename);
@@ -58,7 +61,7 @@ int main()
 						return errno;
 					}
 				}
-				else
+				else if (!(ifile.eof() && ifile.fail() && !ifile.bad()))
 				{
 					std::cerr << "Error efoI43JE reading from input file (line " << lineNumber << ") (" << ifile.eof() << ifile.fail() << ifile.bad() << ofile.eof() << ofile.fail() << ofile.bad() << dataStream.eof() << dataStream.fail() << dataStream.bad() << "): ";
 					perror(nullptr);
@@ -105,7 +108,7 @@ int main()
 				}
 				++lineNumber;
 			}
-			else
+			else if (!(ifile.eof() && ifile.fail() && !ifile.bad()))
 			{
 				std::cerr << "Error Eszqcp3N reading from input file (line " << lineNumber << ") (" << ifile.eof() << ifile.fail() << ifile.bad() << ofile.eof() << ofile.fail() << ofile.bad() << dataStream.eof() << dataStream.fail() << dataStream.bad() << "): ";
 				perror(nullptr);
@@ -152,20 +155,26 @@ int main()
 					const std::uintmax_t newBlocks(readBytes / 50'000'000);
 					if (progressBlocks < newBlocks) {
 						progressBlocks = newBlocks;
-						std::cout << "\33[2K\rInput: " << lineNumber << " lines";
+						std::cout << "\33[2K\rInput: " << lineNumber << " lines - ";
 						if (readBytes < maxAmenableProgress) {
-							std::cout << " " << (readBytes * 100 / ifilesize) << " %";
+							std::cout << (readBytes * 100 / ifilesize) << " % - ";
 						}
-						std::cout << " " << (readBytes / 1'000'000) << " MB out of " << ifilesizeMB << " MB -- Output: " << writtenLineNumber << " lines " << (writtenBytes / 1'000'000) << " MB" << std::flush;
+						std::cout << (readBytes / 1'000'000) << " MB out of " << ifilesizeMB << " MB  |  Output: " << writtenLineNumber << " lines - " << (writtenBytes / 1'000'000) << " MB" << std::flush;
 					}
 				}
-				else
+				else if (!(ifile.eof() && ifile.fail() && !ifile.bad()))
 				{
 					std::cerr << "Error PYKobFTP reading from input file (line " << lineNumber << ") (" << ifile.eof() << ifile.fail() << ifile.bad() << ofile.eof() << ofile.fail() << ofile.bad() << dataStream.eof() << dataStream.fail() << dataStream.bad() << "): ";
 					perror(nullptr);
 					return errno;
 				}
 			}
+			// Final status report
+			std::cout << "\33[2K\rInput: " << lineNumber << " lines - ";
+			if (readBytes < maxAmenableProgress) {
+				std::cout << (readBytes * 100 / ifilesize) << " % - ";
+			}
+			std::cout << (readBytes / 1'000'000) << " MB out of " << ifilesizeMB << " MB  |  Output: " << writtenLineNumber << " lines - " << (writtenBytes / 1'000'000) << " MB" << std::flush;
 		}
 		else
 		{
@@ -178,5 +187,6 @@ int main()
 		perror("Error 6TTfFxar opening input file");
 		return errno;
 	}
+	std::cout << "\nSuccess." << std::endl;
     return 0;
 }
