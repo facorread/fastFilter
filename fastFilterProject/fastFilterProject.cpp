@@ -61,7 +61,7 @@ int main()
 						return errno;
 					}
 				}
-				else if (!(ifile.eof() && ifile.fail() && !ifile.bad()))
+				else
 				{
 					std::cerr << "Error efoI43JE reading from input file (line " << lineNumber << ") (" << ifile.eof() << ifile.fail() << ifile.bad() << ofile.eof() << ofile.fail() << ofile.bad() << dataStream.eof() << dataStream.fail() << dataStream.bad() << "): ";
 					perror(nullptr);
@@ -108,7 +108,7 @@ int main()
 				}
 				++lineNumber;
 			}
-			else if (!(ifile.eof() && ifile.fail() && !ifile.bad()))
+			else
 			{
 				std::cerr << "Error Eszqcp3N reading from input file (line " << lineNumber << ") (" << ifile.eof() << ifile.fail() << ifile.bad() << ofile.eof() << ofile.fail() << ofile.bad() << dataStream.eof() << dataStream.fail() << dataStream.bad() << "): ";
 				perror(nullptr);
@@ -119,55 +119,53 @@ int main()
 			std::uintmax_t writtenBytes(readBytes);
 			std::uintmax_t progressBlocks(0); // This tracker is necessary because progress is not byte-per-byte.
 			constexpr std::uintmax_t maxAmenableProgress(std::numeric_limits<std::uintmax_t>::max() / 100);
-			for (; ifile && !ifile.eof(); ++lineNumber)
+			for (; std::getline(ifile, dataString); ++lineNumber)
 			{
-				if (std::getline(ifile, dataString)) {
-					const std::uintmax_t processedBytes(dataString.length() + newLineSize);
-					readBytes += processedBytes;
-					dataStream.str(dataString);
-					unsigned int colNumber(0);
-					for (; (colNumber < keyColumn) && dataStream && !dataStream.eof(); ++colNumber) {
-						dataStream.ignore(std::numeric_limits<std::streamsize>::max(), ',');
-					}
-					if (colNumber != keyColumn) {
-						std::cerr << "Error 32Cj87cm reading from input file (line " << lineNumber << ") (" << ifile.eof() << ifile.fail() << ifile.bad() << ofile.eof() << ofile.fail() << ofile.bad() << dataStream.eof() << dataStream.fail() << dataStream.bad() << "): colNumber " << colNumber << " keyColumn " << keyColumn << ". Please review the input file." << std::endl;
-						return 1;
-					}
-					unsigned int simStep;
-					if (dataStream >> simStep) {
-						if ((simStep >= 300) && !(simStep % 10)) {
-							writtenBytes += processedBytes;
-							++writtenLineNumber;
-							if (!(ofile << dataString << std::endl))
-							{
-								std::cerr << "Error cgxgSKbH writing to output file (input line " << lineNumber << ") (" << ifile.eof() << ifile.fail() << ifile.bad() << ofile.eof() << ofile.fail() << ofile.bad() << dataStream.eof() << dataStream.fail() << dataStream.bad() << "): ";
-								perror(nullptr);
-								return errno;
-							}
+				const std::uintmax_t processedBytes(dataString.length() + newLineSize);
+				readBytes += processedBytes;
+				dataStream.str(dataString);
+				unsigned int colNumber(0);
+				for (; (colNumber < keyColumn) && dataStream && !dataStream.eof(); ++colNumber) {
+					dataStream.ignore(std::numeric_limits<std::streamsize>::max(), ',');
+				}
+				if (colNumber != keyColumn) {
+					std::cerr << "Error 32Cj87cm reading from input file (line " << lineNumber << ") (" << ifile.eof() << ifile.fail() << ifile.bad() << ofile.eof() << ofile.fail() << ofile.bad() << dataStream.eof() << dataStream.fail() << dataStream.bad() << "): colNumber " << colNumber << " keyColumn " << keyColumn << ". Please review the input file." << std::endl;
+					return 1;
+				}
+				unsigned int simStep;
+				if (dataStream >> simStep) {
+					if ((simStep >= 300) && !(simStep % 10)) {
+						writtenBytes += processedBytes;
+						++writtenLineNumber;
+						if (!(ofile << dataString << std::endl))
+						{
+							std::cerr << "Error cgxgSKbH writing to output file (input line " << lineNumber << ") (" << ifile.eof() << ifile.fail() << ifile.bad() << ofile.eof() << ofile.fail() << ofile.bad() << dataStream.eof() << dataStream.fail() << dataStream.bad() << "): ";
+							perror(nullptr);
+							return errno;
 						}
-					}
-					else
-					{
-						std::cerr << "Error 4tpFWfaq reading from input file (line " << lineNumber << ") (" << ifile.eof() << ifile.fail() << ifile.bad() << ofile.eof() << ofile.fail() << ofile.bad() << dataStream.eof() << dataStream.fail() << dataStream.bad() << "): ";
-						perror(nullptr);
-						return errno;
-					}
-					const std::uintmax_t newBlocks(readBytes / 50'000'000);
-					if (progressBlocks < newBlocks) {
-						progressBlocks = newBlocks;
-						std::cout << "\33[2K\rInput: " << lineNumber << " lines - ";
-						if (readBytes < maxAmenableProgress) {
-							std::cout << (readBytes * 100 / ifilesize) << " % - ";
-						}
-						std::cout << (readBytes / 1'000'000) << " MB out of " << ifilesizeMB << " MB  |  Output: " << writtenLineNumber << " lines - " << (writtenBytes / 1'000'000) << " MB" << std::flush;
 					}
 				}
-				else if (!(ifile.eof() && ifile.fail() && !ifile.bad()))
+				else
 				{
-					std::cerr << "Error PYKobFTP reading from input file (line " << lineNumber << ") (" << ifile.eof() << ifile.fail() << ifile.bad() << ofile.eof() << ofile.fail() << ofile.bad() << dataStream.eof() << dataStream.fail() << dataStream.bad() << "): ";
+					std::cerr << "Error 4tpFWfaq reading from input file (line " << lineNumber << ") (" << ifile.eof() << ifile.fail() << ifile.bad() << ofile.eof() << ofile.fail() << ofile.bad() << dataStream.eof() << dataStream.fail() << dataStream.bad() << "): ";
 					perror(nullptr);
 					return errno;
 				}
+				const std::uintmax_t newBlocks(readBytes / 50'000'000);
+				if (progressBlocks < newBlocks) {
+					progressBlocks = newBlocks;
+					std::cout << "\33[2K\rInput: " << lineNumber << " lines - ";
+					if (readBytes < maxAmenableProgress) {
+						std::cout << (readBytes * 100 / ifilesize) << " % - ";
+					}
+					std::cout << (readBytes / 1'000'000) << " MB out of " << ifilesizeMB << " MB  |  Output: " << writtenLineNumber << " lines - " << (writtenBytes / 1'000'000) << " MB" << std::flush;
+				}
+			}
+			if (!(ifile.eof() && ifile.fail() && !ifile.bad()))
+			{
+				std::cerr << "Error PYKobFTP reading from input file (line " << lineNumber << ") (" << ifile.eof() << ifile.fail() << ifile.bad() << ofile.eof() << ofile.fail() << ofile.bad() << dataStream.eof() << dataStream.fail() << dataStream.bad() << "): ";
+				perror(nullptr);
+				return errno;
 			}
 			// Final status report
 			std::cout << "\33[2K\rInput: " << lineNumber << " lines - ";
