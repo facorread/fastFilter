@@ -32,11 +32,19 @@ int main()
 	const std::filesystem::path inputbase("C:/Users/dirac/NoBackup/2idh/NewMacPro/temp/5790386/ANT-NC144633/natural");
 	std::filesystem::path ifilename(inputbase);
 	ifilename += ".csv";
+	std::cout << "Processing " << ifilename << std::endl;
 	std::ifstream ifile(ifilename);
 	if(ifile)
 	{
+		constexpr bool timeline(true);
 		std::filesystem::path ofilename(inputbase);
-		ofilename += "-subset.csv";
+		if (timeline) {
+			ofilename += "-tl.csv";
+		}
+		else
+		{
+			ofilename += "-subset.csv";
+		}
 		std::ofstream ofile(ofilename);
 		if(ofile)
 		{
@@ -134,7 +142,7 @@ int main()
 				}
 				unsigned int simStep;
 				if (dataStream >> simStep) {
-					if ((simStep >= 300) && !(simStep % 10)) {
+					if ((timeline && (simStep <= 500)) || ((!timeline) && (simStep >= 300) && !(simStep % 10))) {
 						writtenBytes += processedBytes;
 						++writtenLineNumber;
 						if (!(ofile << dataString << std::endl))
